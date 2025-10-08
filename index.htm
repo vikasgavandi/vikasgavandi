@@ -7,6 +7,11 @@
     <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght=300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- GSAP Core and Plugins -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/TextPlugin.min.js"></script>
     <style>
         /* Define custom theme colors and font */
         :root {
@@ -110,14 +115,25 @@
             transition: all 0.3s ease-in-out;
         }
         
-        /* Enhanced animations */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        /* GSAP Animation Classes */
+        .gsap-fade-up {
+            opacity: 0;
+            transform: translateY(50px);
         }
         
-        .animate-fade-in {
-            animation: fadeIn 0.6s ease-out forwards;
+        .gsap-fade-left {
+            opacity: 0;
+            transform: translateX(-50px);
+        }
+        
+        .gsap-fade-right {
+            opacity: 0;
+            transform: translateX(50px);
+        }
+        
+        .gsap-scale {
+            opacity: 0;
+            transform: scale(0.8);
         }
         
         /* Loading spinner */
@@ -297,36 +313,27 @@
             }
         }
 
-        // --- Modal Control Functions ---
+        // --- Modal Control Functions with GSAP ---
         function showModal(title, content) {
             const modal = document.getElementById('skill-modal');
             document.getElementById('modal-title').textContent = title;
             document.getElementById('modal-content').innerHTML = content;
             
-            // Show modal, applying animation classes
-            modal.classList.remove('hidden');
-            setTimeout(() => {
-                modal.querySelector('.modal-card').classList.add('scale-100', 'opacity-100');
-                modal.querySelector('.modal-card').classList.remove('scale-90', 'opacity-0');
-            }, 10);
+            animateModalOpen('skill-modal');
             isModalOpen = true;
         }
 
         function hideModal() {
-            const modal = document.getElementById('skill-modal');
-            // Hide modal, applying reverse animation classes
-            modal.querySelector('.modal-card').classList.add('scale-90', 'opacity-0');
-            modal.querySelector('.modal-card').classList.remove('scale-100', 'opacity-100');
-            
-            setTimeout(() => {
-                modal.classList.add('hidden');
-            }, 300); // Duration matches CSS transition
+            animateModalClose('skill-modal');
             isModalOpen = false;
         }
 
         // --- Gemini LLM Function 1: Skill Capability Insight ---
-        async function generateSkillCapability(skill) {
+        async function generateSkillCapability(skill, element) {
             if (isModalOpen) return;
+            
+            // Animate skill click
+            if (element) animateSkillClick(element);
             
             const loadingContent = `
                 <div class="flex flex-col items-center justify-center space-y-4 py-8">
@@ -524,7 +531,249 @@
             }
         }
 
+        // GSAP Initialization and Animations
+        function initGSAP() {
+            if (typeof gsap === 'undefined') {
+                console.warn('GSAP not loaded, falling back to CSS animations');
+                return;
+            }
+            
+            gsap.registerPlugin(ScrollTrigger, TextPlugin);
+        }
+        
+        function initGSAPAnimations() {
+            if (typeof gsap === 'undefined') return;
+            
+            // OTP Modal entrance animation
+            if (!localStorage.getItem('portfolioAuth')) {
+                gsap.from('#otp-modal .modal-card', {
+                    scale: 0.8,
+                    opacity: 0,
+                    duration: 0.6,
+                    ease: 'back.out(1.7)'
+                });
+                gsap.from('#otp-modal input', {
+                    y: 20,
+                    opacity: 0,
+                    duration: 0.4,
+                    stagger: 0.1,
+                    ease: 'power2.out',
+                    delay: 0.3
+                });
+            }
+            
+            // Main content animations
+            if (localStorage.getItem('portfolioAuth') === 'verified') {
+                initMainContentAnimations();
+            }
+        }
+        
+        function initMainContentAnimations() {
+            if (typeof gsap === 'undefined') return;
+            
+            // Credit card entrance with smooth slide and scale
+            gsap.fromTo('#portfolio-card', 
+                {
+                    y: 80,
+                    opacity: 0,
+                    scale: 0.9
+                },
+                {
+                    y: 0,
+                    opacity: 1,
+                    scale: 1,
+                    duration: 1.5,
+                    ease: 'power3.out',
+                    delay: 0.3
+                }
+            );
+            
+            // Staggered card reveals with smooth timing
+            gsap.fromTo('.data-card',
+                {
+                    y: 60,
+                    opacity: 0,
+                    scale: 0.95
+                },
+                {
+                    y: 0,
+                    opacity: 1,
+                    scale: 1,
+                    duration: 1.2,
+                    stagger: 0.15,
+                    ease: 'power2.out',
+                    delay: 0.8
+                }
+            );
+            
+            // ScrollTrigger animations with smoother transitions
+            setTimeout(() => {
+                gsap.utils.toArray('.transaction-row').forEach((row, index) => {
+                    gsap.fromTo(row,
+                        {
+                            x: -80,
+                            opacity: 0
+                        },
+                        {
+                            x: 0,
+                            opacity: 1,
+                            duration: 0.8,
+                            ease: 'power2.out',
+                            scrollTrigger: {
+                                trigger: row,
+                                start: 'top 90%',
+                                toggleActions: 'play none none reverse'
+                            }
+                        }
+                    );
+                });
+                
+                // Skills animation with bounce effect
+                gsap.utils.toArray('[id$="-skills-list"] span').forEach((skill, index) => {
+                    gsap.fromTo(skill,
+                        {
+                            scale: 0,
+                            opacity: 0,
+                            rotation: -180
+                        },
+                        {
+                            scale: 1,
+                            opacity: 1,
+                            rotation: 0,
+                            duration: 0.6,
+                            ease: 'back.out(1.7)',
+                            delay: index * 0.05,
+                            scrollTrigger: {
+                                trigger: skill.parentElement,
+                                start: 'top 85%',
+                                toggleActions: 'play none none reverse'
+                            }
+                        }
+                    );
+                });
+            }, 200);
+            
+            // Bottom navigation with smooth slide
+            gsap.fromTo('.bottom-nav',
+                {
+                    y: 100,
+                    opacity: 0
+                },
+                {
+                    y: 0,
+                    opacity: 1,
+                    duration: 1.0,
+                    ease: 'power2.out',
+                    delay: 2.0
+                }
+            );
+        }
+        
+        function animateOTPSuccess() {
+            if (typeof gsap === 'undefined') {
+                document.getElementById('otp-modal').classList.add('hidden');
+                document.getElementById('main-content').classList.remove('hidden');
+                return;
+            }
+            
+            const tl = gsap.timeline();
+            
+            tl.to('#otp-modal', {
+                opacity: 0,
+                scale: 0.8,
+                y: -50,
+                duration: 0.6,
+                ease: 'power2.in',
+                onComplete: () => {
+                    document.getElementById('otp-modal').classList.add('hidden');
+                    document.getElementById('main-content').classList.remove('hidden');
+                }
+            })
+            .call(initMainContentAnimations);
+        }
+        
+        function animateModalOpen(modalId) {
+            const modal = document.getElementById(modalId);
+            const card = modal.querySelector('.modal-card');
+            
+            modal.classList.remove('hidden');
+            
+            if (typeof gsap !== 'undefined') {
+                gsap.from(card, {
+                    scale: 0.8,
+                    opacity: 0,
+                    y: 50,
+                    duration: 0.4,
+                    ease: 'back.out(1.7)'
+                });
+            }
+        }
+        
+        function animateModalClose(modalId) {
+            const modal = document.getElementById(modalId);
+            const card = modal.querySelector('.modal-card');
+            
+            if (typeof gsap !== 'undefined') {
+                gsap.to(card, {
+                    scale: 0.8,
+                    opacity: 0,
+                    y: -50,
+                    duration: 0.3,
+                    ease: 'power2.in',
+                    onComplete: () => modal.classList.add('hidden')
+                });
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+        
+        function animateSkillClick(element) {
+            if (typeof gsap !== 'undefined') {
+                gsap.to(element, {
+                    scale: 1.15,
+                    rotation: 5,
+                    duration: 0.15,
+                    yoyo: true,
+                    repeat: 1,
+                    ease: 'back.out(1.7)'
+                });
+            }
+        }
+        
+        function animateCopyFeedback(element) {
+            if (typeof gsap !== 'undefined') {
+                const tl = gsap.timeline();
+                
+                tl.to(element, {
+                    scale: 1.08,
+                    y: -3,
+                    duration: 0.15,
+                    ease: 'back.out(1.7)'
+                })
+                .to(element, {
+                    backgroundColor: '#10b981',
+                    color: '#ffffff',
+                    duration: 0.3,
+                    ease: 'power2.out'
+                })
+                .to(element, {
+                    scale: 1,
+                    y: 0,
+                    backgroundColor: 'transparent',
+                    color: '#e5e7eb',
+                    duration: 1.0,
+                    ease: 'power2.out'
+                });
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
+            // Initialize GSAP
+            initGSAP();
+            
+            // Initialize GSAP animations
+            initGSAPAnimations();
+            
             // Check if user is already authenticated
             if (localStorage.getItem('portfolioAuth') === 'verified') {
                 document.getElementById('otp-modal').classList.add('hidden');
@@ -572,7 +821,7 @@
             const techSkillsList = document.getElementById('tech-skills-list');
             if (techSkillsList) {
                 techSkillsList.innerHTML = [...portfolioData.skills.languages, ...portfolioData.skills.frameworks].map(skill => `
-                    <span onclick="generateSkillCapability('${skill}')" class="cursor-pointer text-xs font-medium text-white px-3 py-1 rounded-full bg-secondary/80 border border-primary-color/50 shadow-md hover:bg-primary-color hover:text-deep-charcoal transition duration-300">
+                    <span onclick="generateSkillCapability('${skill}', this)" class="cursor-pointer text-xs font-medium text-white px-3 py-1 rounded-full bg-secondary/80 border border-primary-color/50 shadow-md hover:bg-primary-color hover:text-deep-charcoal transition duration-300">
                         ${skill} ✨
                     </span>
                 `).join('');
@@ -582,7 +831,7 @@
             const hardSkillsList = document.getElementById('hard-skills-list');
             if (hardSkillsList) {
                 hardSkillsList.innerHTML = portfolioData.skills.hardSkills.map(skill => `
-                    <span onclick="generateSkillCapability('${skill}')" class="cursor-pointer text-xs font-medium text-white px-3 py-1 rounded-full bg-secondary/80 border border-primary-color/50 shadow-md hover:bg-primary-color hover:text-deep-charcoal transition duration-300">
+                    <span onclick="generateSkillCapability('${skill}', this)" class="cursor-pointer text-xs font-medium text-white px-3 py-1 rounded-full bg-secondary/80 border border-primary-color/50 shadow-md hover:bg-primary-color hover:text-deep-charcoal transition duration-300">
                         ${skill} ✨
                     </span>
                 `).join('');
@@ -592,7 +841,7 @@
             const softSkillsList = document.getElementById('soft-skills-list');
             if (softSkillsList) {
                 softSkillsList.innerHTML = portfolioData.skills.softSkills.map(skill => `
-                    <span onclick="generateSkillCapability('${skill}')" class="cursor-pointer text-xs font-medium text-white px-3 py-1 rounded-full bg-secondary/80 border border-blue-400/50 shadow-md hover:bg-blue-500 hover:text-white transition duration-300">
+                    <span onclick="generateSkillCapability('${skill}', this)" class="cursor-pointer text-xs font-medium text-white px-3 py-1 rounded-full bg-secondary/80 border border-blue-400/50 shadow-md hover:bg-blue-500 hover:text-white transition duration-300">
                         ${skill} 💡
                     </span>
                 `).join('');
@@ -657,70 +906,62 @@
             document.getElementById('learning-icon').innerHTML = icons.learning;
             document.getElementById('skills-icon').innerHTML = icons.skills;
             
-            // Attach copy listeners with enhanced feedback
+            // Attach copy listeners with GSAP feedback
             document.querySelectorAll('[data-copy-text]').forEach(element => {
                 element.addEventListener('click', async (e) => {
                     const text = element.getAttribute('data-copy-text');
                     const originalText = element.innerHTML;
                     
-                    // Visual feedback
+                    // GSAP animation feedback
+                    animateCopyFeedback(element);
                     element.innerHTML = '✓ Copied!';
-                    element.classList.add('text-green-400');
                     
                     await copyToClipboard(text);
                     
                     setTimeout(() => {
                         element.innerHTML = originalText;
-                        element.classList.remove('text-green-400');
                     }, 1500);
                 });
             });
             
-            // Add keyboard navigation
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && isModalOpen) {
-                    hideModal();
-                }
-                if (e.key === 'Enter' && document.getElementById('otp-modal').style.display !== 'none') {
-                    verifyOTP();
-                }
-            });
+            // Add keyboard navigation - prevent duplicate listeners
+            let keyboardListenerAdded = false;
+            if (!keyboardListenerAdded) {
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape' && isModalOpen) {
+                        hideModal();
+                    }
+                    if (e.key === 'Enter' && !document.getElementById('otp-modal').classList.contains('hidden')) {
+                        verifyOTP();
+                    }
+                });
+                keyboardListenerAdded = true;
+            }
             
 
 
             // Enhanced page load with performance tracking
             performanceMetrics.pageLoadTime = performance.now();
             
-            // Add scroll animations
-            const observerOptions = {
-                threshold: 0.1,
-                rootMargin: '0px 0px -50px 0px'
-            };
+            // Remove old scroll observer (replaced by GSAP ScrollTrigger)
+            // GSAP ScrollTrigger handles all scroll animations now
             
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('animate-fade-in');
+            // Development mode toggle (Ctrl+Shift+D) - prevent duplicate listeners
+            let devModeListenerAdded = false;
+            if (!devModeListenerAdded) {
+                document.addEventListener('keydown', (e) => {
+                    if (e.ctrlKey && e.shiftKey && e.key === 'D') {
+                        toggleDevMode();
                     }
                 });
-            }, observerOptions);
-            
-            document.querySelectorAll('.data-card, .credit-card').forEach(card => {
-                observer.observe(card);
-            });
-            
-            // Development mode toggle (Ctrl+Shift+D)
-            document.addEventListener('keydown', (e) => {
-                if (e.ctrlKey && e.shiftKey && e.key === 'D') {
-                    toggleDevMode();
-                }
-            });
+                devModeListenerAdded = true;
+            }
             
             // Update performance indicator
             updatePerformanceIndicator();
         });
         
-        // OTP Verification
+        // OTP Verification with GSAP animations
         function verifyOTP() {
             const otp1 = document.getElementById('otp-1').value;
             const otp2 = document.getElementById('otp-2').value;
@@ -729,12 +970,19 @@
             const enteredOTP = otp1 + otp2 + otp3 + otp4;
             
             if (enteredOTP === '2828') {
-                // Store authentication in localStorage
                 localStorage.setItem('portfolioAuth', 'verified');
-                document.getElementById('otp-modal').classList.add('hidden');
-                document.getElementById('main-content').classList.remove('hidden');
+                animateOTPSuccess();
                 showNotification('Access granted! Welcome to the portfolio', 'success');
             } else {
+                // Shake animation for invalid OTP
+                if (typeof gsap !== 'undefined') {
+                    gsap.to('#otp-modal .modal-card', {
+                        x: [-10, 10, -10, 10, 0],
+                        duration: 0.4,
+                        ease: 'power2.out'
+                    });
+                }
+                
                 ['otp-1', 'otp-2', 'otp-3', 'otp-4'].forEach(id => {
                     document.getElementById(id).classList.add('border-red-500');
                 });
@@ -874,7 +1122,7 @@
                     <!-- Card Number / Focus -->
                     <div class="flex flex-col space-y-1">
                         <p class="text-sm text-gray-400 font-medium tracking-wider">PRIMARY FOCUS</p>
-                        <div class="text-white text-3xl font-semibold tracking-wider flex items-center space-x-3">
+                        <div class="text-white text-2xl md:text-3xl font-semibold tracking-wider flex items-center justify-center space-x-2">
                             <span class="text-primary-color">ARCHITECT</span>
                             <span class="text-gray-400">&</span>
                             <span>DESIGNER</span>
