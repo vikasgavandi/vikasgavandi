@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vikas B. Gavandi - Digital Credit Card Portfolio</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght=300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Define custom theme colors and font */
+        :root {
+            --primary-color: #db8920; /* Gold/Orange Highlight */
+            --secondary-color: #262626; /* Deep Charcoal */
+            --bg-color: #171717; /* Even deeper background */
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background-color: var(--bg-color);
+            color: #E5E7EB; /* Light gray text */
+            min-height: 100vh;
+        }
+
+        /* Graph Paper Background */
+        .bg-pattern {
+            background: 
+                linear-gradient(rgba(219, 137, 32, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(219, 137, 32, 0.1) 1px, transparent 1px),
+                radial-gradient(circle at 10% 20%, rgba(38, 38, 38, 0.4) 0%, rgba(23, 23, 23, 0) 100%), 
+                linear-gradient(135deg, #171717 0%, #0d0d0d 100%);
+            background-size: 20px 20px, 20px 20px, 100% 100%, 100% 100%;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+
+        /* Credit Card Glassmorphism Effect */
+        .credit-card {
+            background: rgba(38, 38, 38, 0.7); /* Secondary Color with opacity */
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37), 
+                        inset 0 0 0 1px rgba(219, 137, 32, 0.2); /* Inner gold glow */
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .credit-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.5), 
+                        inset 0 0 10px 2px rgba(219, 137, 32, 0.4); /* Stronger inner glow on hover */
+        }
+
+        /* Credit Card Chip/Indicator */
+        .chip {
+            width: 48px;
+            height: 32px;
+            background-color: #A97A2C;
+            border-radius: 6px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6), 0 1px 1px rgba(255, 255, 255, 0.2);
+        }
+
+        /* Data Card (General Neomorphic/Glassmorphism) */
+        .data-card {
+            background: var(--secondary-color);
+            border-radius: 1.5rem;
+            box-shadow: 
+                6px 6px 12px #0f0f0f, /* Dark shadow */
+                -6px -6px 12px #3d3d3d; /* Light shadow for neomorphism */
+        }
+        
+        /* Highlight Buttons */
+        .highlight-button {
+            background-color: var(--primary-color);
+            color: #171717;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 0 0px var(--primary-color);
+        }
+
+        .highlight-button:hover {
+            background-color: #e8952b;
+            box-shadow: 0 0 15px 3px rgba(219, 137, 32, 0.7); /* Glowing outline */
+            transform: translateY(-2px);
+        }
+
+        /* Primary text highlight color */
+        .text-primary-color {
+            color: var(--primary-color);
+        }
+
+        /* Data Transaction Row Effect */
+        .transaction-row:hover {
+            background-color: rgba(219, 137, 32, 0.1);
+            transform: translateX(4px);
+        }
+
+        /* Utility for simulating a 'magnetic stripe' line */
+        .magnetic-line {
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-color) 0%, #262626 50%, var(--primary-color) 100%);
+        }
+        
+        /* Modal card transition classes */
+        .modal-card {
+            transition: all 0.3s ease-in-out;
+        }
+        
+        /* Enhanced animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+        
+        /* Loading spinner */
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .animate-spin {
+            animation: spin 1s linear infinite;
+        }
+        
+        /* Pulse effect for interactive elements */
+        .pulse-on-hover:hover {
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        /* Improved accessibility */
+        .focus-visible:focus {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+        
+        /* Bottom Navigation */
+        .bottom-nav {
+            background: rgba(38, 38, 38, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-top: 1px solid rgba(219, 137, 32, 0.2);
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': '#db8920',
+                        'secondary': '#262626',
+                        'deep-charcoal': '#171717',
+                    },
+                    borderRadius: {
+                        '4xl': '2rem',
+                    },
+                }
+            }
+        }
+
+        // --- Portfolio Data (Extracted from Resume) ---
+        const portfolioData = {
+            name: "Vikas B. Gavandi",
+            title: "Software Engineer / Visualiser",
+            contact: {
+                phone: "9172656043",
+                email: "vikasgavandi.dev@gmail.com",
+                github: "github.com/vikasgavandi",
+                linkedin: "linkedin/vikas-gavandi-689163289/"
+            },
+            skills: {
+                languages: ["Node JS", "Golang", "PHP", "Java", "C++", "C", "JavaScript", "AJAX", "jQuery"],
+                frameworks: ["Angular", "Express JS", "Bootstrap"],
+                database: ["MySQL", "MongoDB"],
+                tools: ["Figma", "Miro", "AutoCAD", "Adobe Creative Suite"],
+                hardSkills: ["Coding", "Debugging", "Database", "Concept Design", "UI/UX", "Motion Graphics", "Organized"],
+                softSkills: ["Flexibility", "Leadership", "Problem solving", "Communication", "Time Management", "Collaboration"],
+            },
+            npmPackages: [
+                { name: "easy-package-logger", status: "Published" },
+                { name: "ratelimitsense", status: "Published" },
+                { name: "blueprintr-cli", status: "Published" },
+                { name: "logsupd (ongoing)", status: "In Progress" },
+            ],
+            experience: [
+                { 
+                    company: "KnoxxFoods Pty Ltd. (Remote / Australia)", 
+                    role: "Creative Visualiser / Software Developer", 
+                    duration: "March 2025 - Present", 
+                    description: "Developed COSystem (Customer Order Portal) using Node.js, MySQL, HTML, CSS, JavaScript, and integrated OpenAI for internal support. Key features include customer-specific pricing, future delivery, inventory tracking, and warehouse operations."
+                },
+                { 
+                    company: "Alembic Pharmaceuticals Ltd", 
+                    role: "Senior Software Developer", 
+                    duration: "May 2021 - Feb 2025", 
+                    description: "Built LMS Platform (Angular, Node.js, MySQL), created interactive activities (Quiz Game, Photoframer), and developed excelAl (Google Gemma Model 1.5 integration) for Excel data processing and secure File Sharing Wizard (Angular, Golang, MongoDB)."
+                },
+                { 
+                    company: "FancyFluff (Star Born LLP)", 
+                    role: "Motion & Sr. Web Designer", 
+                    duration: "Aug 2020 - Oct 2021", 
+                    description: "Developed DesignFlow chatbot for 24/7 customer support and created interactive Instagram games with engaging motion graphics and social media advertising."
+                },
+                // Add more experiences as transactions...
+                { company: "Grey Lifescience (Aramuc Pvt Ltd)", role: "Web & UI Developer", duration: "Jan 2018 - Sep 2020", description: "Designed Mobile App UI and website layouts for major pharmaceutical clients (Cipla, Pfizer, Sun Pharma)." },
+                { company: "Maharashtra Buland Times", role: "Graphic Designer & Typist", duration: "Aug 2016 - Jan 2018", description: "Designed complete newspaper layout using Adobe InDesign and created attractive client advertisements." },
+                { company: "Shine Art Press (Part time)", role: "Graphic Designer", duration: "Jan 2012 - Jan 2018", description: "Specialized in graphic design using CorelDraw and Photoshop with strong focus on client communication and visual branding solutions." },
+                { company: "Wastu Vishwa", role: "Draughtsman", duration: "Mar 2010 - Oct 2011", description: "Technical drafting and site supervision using AutoCAD for architectural and construction projects with hands-on field experience." },
+                { company: "Chari Creation", role: "Print Coordinator", duration: "Apr 2009 - Feb 2010", description: "Coordinated print production processes and managed vendor communications to ensure quality delivery and project timelines." }
+            ],
+            certifications: [
+                { title: "High-Level Design of Cab-Booking Apps", provider: "Scaler (Online)", year: "2023" },
+                { title: "Monolithic and Microservice Architecture", provider: "Scaler (Online)", year: "2023" },
+                { title: "Low-Level Design of Payment Apps", provider: "Scaler (Online)", year: "2023" },
+                { title: "High Level Design of OTT Platform", provider: "Scaler (Online)", year: "2023" }
+            ],
+            education: [
+                { degree: "B.Sc (IT)", institution: "Symbiosis I. University", duration: "2008 - 2011", grade: "A" },
+                { degree: "Diploma In Software Programming", institution: "Mumbai Software Institute", duration: "2010 - 2012", grade: "A" },
+                { degree: "Typography", institution: "Mumbai Software Institute", duration: "2013 - 2014", grade: "A" }
+            ],
+            learningSkills: ["System Design", "Software Architecture", "DSA", "Principles of UX & Product Design"]
+        };
+
+        const icons = {
+            education: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>`,
+            learning: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>`,
+            dev: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-code-2"><path d="m18 16 4-4-4-4"/><path d="m6 8-4 4 4 4"/><path d="m14.5 4-5 16"/></svg>`,
+            design: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-paintbrush"><path d="M18.37 2.63L21.37 5.63C22.34 6.6 22.34 8.16 21.37 9.13L16.5 14L2 14V8L16.5 2.63C17.5 1.63 19.3 1.63 20.3 2.63Z"/><path d="M2 20h20"/><path d="M5 11l4 4"/></svg>`,
+            arch: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layout-grid"><rect width="18" height="18" x="3" y="3" rx="2"/></svg>`,
+            github: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-github"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2.5 6-5.5.08-1.25-.27-2.44-.78-3.5.38-1.4.16-3.18-.73-4.5h.05c-.65-.54-1.42-.7-2.14-.7-.93 0-1.78.35-2.61 1.05-.72-.2-1.47-.35-2.25-.35s-1.54.15-2.25.35c-.83-.7-1.68-1.05-2.61-1.05-.73 0-1.5.16-2.14.7-.89 1.32-1.11 3.1-.73 4.5-.51 1.06-.87 2.25-.78 3.5 0 3 3 5.5 6 5.5-.39.46-.72 1.05-.83 1.6-.26.33-.52.68-.78 1.02V22"/></svg>`,
+            mail: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-mail"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.8 1.8 0 0 1-2.06 0L2 7"/></svg>`,
+            phone: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-phone"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-5.6-5.6A19.79 19.79 0 0 1 2 4.18V2.82C2 2.37 2.37 2 2.82 2h3.5A2 2 0 0 1 8.32 4.22L9.67 7.5a2 2 0 0 1-.36 2.15l-1.68 1.68a14.7 14.7 0 0 0 6.64 6.64l1.68-1.68a2 2 0 0 1 2.15-.36l3.28 1.35A2 2 0 0 1 22 16.92Z"/></svg>`,
+            linkedin: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-linkedin"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>`,
+            npm: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-package-plus"><path d="M12.89 2.18a1 1 0 0 0-.89 0l-7.8 4.09a1 1 0 0 0-.5 1.09V15l-1.35.68a1 1 0 0 0-.5 1.09v3.63a.5.5 0 0 0 .5.5H12"/><path d="m20.2 16.2-4.13-2.18a1 1 0 0 0-.94 0l-4.22 2.22a1 1 0 0 0-.51.89v3.78a.5.5 0 0 0 .5.5h10a.5.5 0 0 0 .5-.5v-3.78a1 1 0 0 0-.51-.89Z"/><path d="M10.15 8.4a1 1 0 0 0 0 1.74l3.78 1.99a1 1 0 0 0 1.74 0l3.78-1.99a1 1 0 0 0 0-1.74L15.67 6.4a1 1 0 0 0-1.74 0Z"/><path d="M18 15v3"/><path d="M21 18h-6"/></svg>`,
+            cert: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-award"><circle cx="12" cy="8" r="6"/><path d="M15.47 11.23L17.7 21h-2.14l-2.04-7.55"/><path d="M8.53 11.23L6.3 21h2.14l2.04-7.55"/><path d="M12 21v-3"/></svg>`,
+            home: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>`,
+            work: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>`,
+            skills: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>`,
+            contact: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>`
+        }
+        
+        // Global variable for modal state to prevent multiple simultaneous calls
+        let isModalOpen = false; 
+        
+        // Performance monitoring
+        const performanceMetrics = {
+            pageLoadTime: 0,
+            apiCalls: 0,
+            errors: 0
+        };
+
+        // Function to handle API request with exponential backoff
+        async function fetchWithRetry(apiUrl, payload, retries = 3) {
+            const apiKey = ""; // API key is provided by the runtime environment
+            performanceMetrics.apiCalls++;
+            const fullUrl = `${apiUrl}?key=${apiKey}`;
+
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const response = await fetch(fullUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (response.ok) {
+                        return await response.json();
+                    } else if (response.status === 429 && i < retries - 1) {
+                        const delay = Math.pow(2, i) * 1000 + Math.random() * 1000;
+                        console.log(`Rate limit exceeded. Retrying in ${delay / 1000}s...`);
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                    } else {
+                        throw new Error(`API call failed with status: ${response.status}`);
+                    }
+                } catch (error) {
+                    performanceMetrics.errors++;
+                    if (i === retries - 1) {
+                        console.error("API call failed after all retries:", error);
+                        throw error;
+                    }
+                    // For other errors, retry after a slight delay
+                    const delay = 1000 + Math.random() * 1000;
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                }
+            }
+        }
+
+        // --- Modal Control Functions ---
+        function showModal(title, content) {
+            const modal = document.getElementById('skill-modal');
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-content').innerHTML = content;
+            
+            // Show modal, applying animation classes
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.querySelector('.modal-card').classList.add('scale-100', 'opacity-100');
+                modal.querySelector('.modal-card').classList.remove('scale-90', 'opacity-0');
+            }, 10);
+            isModalOpen = true;
+        }
+
+        function hideModal() {
+            const modal = document.getElementById('skill-modal');
+            // Hide modal, applying reverse animation classes
+            modal.querySelector('.modal-card').classList.add('scale-90', 'opacity-0');
+            modal.querySelector('.modal-card').classList.remove('scale-100', 'opacity-100');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300); // Duration matches CSS transition
+            isModalOpen = false;
+        }
+
+        // --- Gemini LLM Function 1: Skill Capability Insight ---
+        async function generateSkillCapability(skill) {
+            if (isModalOpen) return;
+            
+            const loadingContent = `
+                <div class="flex flex-col items-center justify-center space-y-4 py-8">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-color"></div>
+                    <p class="text-gray-400">Analyzing Vikas's portfolio for expertise in **${skill}**...</p>
+                </div>
+            `;
+            showModal(`✨ ${skill} - Capability Insight`, loadingContent);
+
+            // Check if API key is available
+            const apiKey = ""; // API key is provided by the runtime environment
+            if (!apiKey) {
+                document.getElementById('modal-content').innerHTML = getFallbackSkillInsight(skill);
+                return;
+            }
+
+            try {
+                // Construct a summary of all relevant experience descriptions for context
+                const experienceText = portfolioData.experience.map(exp => 
+                    `Company: ${exp.company}, Role: ${exp.role}, Description: ${exp.description}`
+                ).join('\n---\n');
+
+                const systemPrompt = `You are an executive technical recruiter analyzing a candidate's portfolio. Your task is to generate a single, compelling, 3-4 sentence statement describing the candidate's core capability and value proposition related to the specific skill requested. You MUST base the description ONLY on the provided experience context. Use strong, action-oriented language. The candidate's name is Vikas B. Gavandi.`;
+                
+                const userQuery = `Candidate Skill: "${skill}". Candidate's relevant experience history: \n\n${experienceText}`;
+
+                const payload = {
+                    contents: [{ parts: [{ text: userQuery }] }],
+                    systemInstruction: { parts: [{ text: systemPrompt }] },
+                };
+
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent`;
+                
+                const result = await fetchWithRetry(apiUrl, payload);
+                const text = result.candidates?.[0]?.content?.parts?.[0]?.text || "Could not generate insight. Please try again.";
+
+                document.getElementById('modal-content').innerHTML = `<p class="text-base text-gray-300">${text}</p>`;
+
+            } catch (error) {
+                document.getElementById('modal-content').innerHTML = getFallbackSkillInsight(skill);
+                console.error(error);
+            }
+        }
+        
+        // --- Gemini LLM Function 2: Career Trajectory Analysis ---
+        async function generateCareerAnalysis() {
+            if (isModalOpen) return;
+            
+            const loadingContent = `
+                <div class="flex flex-col items-center justify-center space-y-4 py-8">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-color"></div>
+                    <p class="text-gray-400">Analyzing Vikas B. Gavandi's comprehensive portfolio for career roadmap generation...</p>
+                </div>
+            `;
+            showModal(`✨ Personalized Career Trajectory`, loadingContent);
+
+            // Check if API key is available
+            const apiKey = ""; // API key is provided by the runtime environment
+            if (!apiKey) {
+                document.getElementById('modal-content').innerHTML = getFallbackCareerAnalysis();
+                return;
+            }
+
+            try {
+                // Collect ALL relevant data into a single context string
+                const skillList = [
+                    ...portfolioData.skills.languages, 
+                    ...portfolioData.skills.frameworks, 
+                    ...portfolioData.skills.database, 
+                    ...portfolioData.skills.tools, 
+                    ...portfolioData.skills.hardSkills, 
+                    ...portfolioData.skills.softSkills
+                ].join(', ');
+
+                const experienceText = portfolioData.experience.map(exp => 
+                    `Job: ${exp.role} @ ${exp.company} (${exp.duration}) - Key Projects: ${exp.description}`
+                ).join('\n');
+                
+                const certificationsText = portfolioData.certifications.join(', ');
+
+                const combinedContext = `
+                    Candidate Name: Vikas B. Gavandi
+                    Current Title: ${portfolioData.title}
+                    Skills (Technical, Design, Soft): ${skillList}
+                    Certifications: ${certificationsText}
+                    Work History Details:
+                    ---
+                    ${experienceText}
+                    ---
+                `;
+
+                const systemPrompt = `You are a Senior Career Architect. Your goal is to provide Vikas B. Gavandi with a clear, ambitious, and realistic career trajectory based on his extensive background in software development, UI/UX, and creative visualization. Provide the analysis in three distinct paragraphs. Start each paragraph with a bold heading (e.g., **Immediate Next Role**).`;
+                
+                const userQuery = `Based on the following comprehensive portfolio data, generate a structured career analysis: ${combinedContext} 
+1. **Immediate Next Role**: Suggest the single best job title and justify why.
+2. **5-Year Trajectory**: Outline a plausible 5-year career path, listing 2-3 key roles/milestones.
+3. **Skill Gap Recommendations**: Recommend 2-3 specific, high-impact technical skills or areas for him to focus on.`;
+
+                const payload = {
+                    contents: [{ parts: [{ text: userQuery }] }],
+                    systemInstruction: { parts: [{ text: systemPrompt }] },
+                };
+
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent`;
+                
+                const result = await fetchWithRetry(apiUrl, payload);
+                const text = result.candidates?.[0]?.content?.parts?.[0]?.text || "Could not generate trajectory analysis. Please try again.";
+
+                // Format the output for better readability
+                const formattedText = text.replace(/\n\n/g, '</p><p class="mt-4 text-base text-gray-300">');
+                
+                document.getElementById('modal-content').innerHTML = `<p class="text-base text-gray-300">${formattedText}</p>`;
+
+            } catch (error) {
+                document.getElementById('modal-content').innerHTML = getFallbackCareerAnalysis();
+                console.error(error);
+            }
+        }
+        
+        // Fallback content functions
+        function getFallbackCareerAnalysis() {
+            return `
+                <div class="space-y-4">
+                    <p class="text-base text-gray-300"><strong>Immediate Next Role:</strong> Senior Full-Stack Developer or Technical Lead. With 7+ years of experience spanning Node.js, Angular, and creative visualization, Vikas is positioned for leadership roles that combine technical depth with creative problem-solving.</p>
+                    
+                    <p class="text-base text-gray-300"><strong>5-Year Trajectory:</strong> Progress from Senior Developer → Engineering Manager → VP of Engineering or CTO. Key milestones include leading cross-functional teams, architecting scalable systems, and driving technical strategy for product development.</p>
+                    
+                    <p class="text-base text-gray-300"><strong>Skill Gap Recommendations:</strong> Focus on cloud architecture (AWS/Azure), advanced system design patterns, and team leadership methodologies. Consider certifications in DevOps and agile project management to complement existing technical expertise.</p>
+                    
+                    <div class="mt-4 p-3 bg-yellow-900/30 rounded-lg border border-yellow-600/50">
+                        <p class="text-xs text-yellow-300">💡 This is a curated analysis based on portfolio data. For AI-powered insights, configure the Gemini API key.</p>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function getFallbackSkillInsight(skill) {
+            const insights = {
+                'Node JS': 'Vikas demonstrates advanced Node.js expertise through multiple production systems including COSystem for KnoxxFoods and LMS platforms at Alembic Pharmaceuticals, showcasing ability to build scalable backend architectures.',
+                'Angular': 'Strong Angular proficiency evidenced by enterprise-level applications including LMS platforms and File Sharing Wizard, demonstrating mastery of modern frontend frameworks and component-based architecture.',
+                'MySQL': 'Extensive database experience with MySQL across multiple projects, including customer order portals and learning management systems, showing capability in data modeling and optimization.',
+                'Figma': 'Professional UI/UX design skills using Figma for creating user-centered designs, complementing technical development capabilities with strong visual design expertise.',
+                'JavaScript': 'Deep JavaScript knowledge spanning frontend and backend development, with experience in modern ES6+ features, AJAX, and jQuery for interactive web applications.',
+                'UI/UX': 'Comprehensive UI/UX expertise demonstrated through work at pharmaceutical companies and creative agencies, combining technical implementation with user experience design principles.'
+            };
+            
+            const insight = insights[skill] || `Vikas has demonstrated proficiency in ${skill} through various projects in his portfolio, contributing to successful software solutions across multiple industries.`;
+            
+            return `
+                <div>
+                    <p class="text-base text-gray-300">${insight}</p>
+                    <div class="mt-4 p-3 bg-blue-900/30 rounded-lg border border-blue-600/50">
+                        <p class="text-xs text-blue-300">💡 This is a curated insight based on portfolio data. For AI-powered analysis, configure the Gemini API key.</p>
+                    </div>
+                </div>
+            `;
+        }
+
+
+        // Enhanced notification system
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `fixed top-4 right-4 p-3 rounded-lg shadow-lg z-50 transition-all duration-300 ${
+                type === 'success' ? 'bg-green-600 text-white' : 'bg-red-600 text-white'
+            }`;
+            notification.classList.remove('hidden', 'opacity-0', 'translate-y-2');
+            notification.classList.add('opacity-100', 'translate-y-0');
+            
+            setTimeout(() => {
+                notification.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => notification.classList.add('hidden'), 300);
+            }, 2000);
+        }
+        
+        // Enhanced clipboard function with modern API fallback
+        async function copyToClipboard(text) {
+            try {
+                if (navigator.clipboard) {
+                    await navigator.clipboard.writeText(text);
+                } else {
+                    // Fallback for older browsers
+                    const tempInput = document.createElement('input');
+                    document.body.appendChild(tempInput);
+                    tempInput.setAttribute('value', text);
+                    tempInput.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(tempInput);
+                }
+
+                // Enhanced notification with animation
+                showNotification(`${text} copied to clipboard!`, 'success');
+            } catch (err) {
+                showNotification('Failed to copy to clipboard', 'error');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check if user is already authenticated
+            if (localStorage.getItem('portfolioAuth') === 'verified') {
+                document.getElementById('otp-modal').classList.add('hidden');
+                document.getElementById('main-content').classList.remove('hidden');
+            } else {
+                // Setup OTP inputs and auto-focus first input
+                setupOTPInputs();
+                document.getElementById('otp-1').focus();
+            }
+
+            // --- RENDER DYNAMIC CONTENT ---
+
+            // RENDER 1: NPM Packages
+            const npmList = document.getElementById('npm-list');
+            if (npmList) {
+                npmList.innerHTML = portfolioData.npmPackages.map(pkg => `
+                    <li class="flex justify-between items-center text-sm font-medium transition-transform duration-200 transaction-row rounded-lg p-2 -m-2">
+                        <span class="text-white">${pkg.name}</span>
+                        <span class="${pkg.status === 'Published' ? 'text-green-400' : 'text-primary-color'} text-xs font-semibold px-2 py-1 rounded-full bg-secondary/50">
+                            ${pkg.status.toUpperCase()}
+                        </span>
+                    </li>
+                `).join('');
+            }
+
+            // RENDER 2: Experience
+            const experienceList = document.getElementById('experience-list');
+            if (experienceList) {
+                experienceList.innerHTML = portfolioData.experience.map(exp => `
+                    <details class="transaction-row p-4 rounded-lg cursor-pointer transition duration-300">
+                        <summary class="flex justify-between items-center text-lg font-semibold text-white">
+                            <div class="flex flex-col md:flex-row md:items-center md:space-x-4">
+                                <span class="text-primary-color text-sm md:text-base">${exp.role}</span>
+                                <span class="text-gray-400 text-xs md:text-sm font-normal hidden sm:block">@ ${exp.company}</span>
+                            </div>
+                            <span class="text-xs text-gray-500 min-w-max ml-4">${exp.duration}</span>
+                        </summary>
+                        <p class="text-sm text-gray-300 mt-2 ml-4 border-l border-primary-color/50 pl-3">${exp.description}</p>
+                        <p class="text-xs text-gray-400 mt-2 sm:hidden ml-4">@ ${exp.company}</p>
+                    </details>
+                `).join('');
+            }
+
+            // RENDER 3: Tech Stack (Langs & Frameworks) - NOW CLICKABLE
+            const techSkillsList = document.getElementById('tech-skills-list');
+            if (techSkillsList) {
+                techSkillsList.innerHTML = [...portfolioData.skills.languages, ...portfolioData.skills.frameworks].map(skill => `
+                    <span onclick="generateSkillCapability('${skill}')" class="cursor-pointer text-xs font-medium text-white px-3 py-1 rounded-full bg-secondary/80 border border-primary-color/50 shadow-md hover:bg-primary-color hover:text-deep-charcoal transition duration-300">
+                        ${skill} ✨
+                    </span>
+                `).join('');
+            }
+
+            // RENDER 4: Hard Skills - CLICKABLE
+            const hardSkillsList = document.getElementById('hard-skills-list');
+            if (hardSkillsList) {
+                hardSkillsList.innerHTML = portfolioData.skills.hardSkills.map(skill => `
+                    <span onclick="generateSkillCapability('${skill}')" class="cursor-pointer text-xs font-medium text-white px-3 py-1 rounded-full bg-secondary/80 border border-primary-color/50 shadow-md hover:bg-primary-color hover:text-deep-charcoal transition duration-300">
+                        ${skill} ✨
+                    </span>
+                `).join('');
+            }
+            
+            // RENDER 5: Soft Skills - CLICKABLE
+            const softSkillsList = document.getElementById('soft-skills-list');
+            if (softSkillsList) {
+                softSkillsList.innerHTML = portfolioData.skills.softSkills.map(skill => `
+                    <span onclick="generateSkillCapability('${skill}')" class="cursor-pointer text-xs font-medium text-white px-3 py-1 rounded-full bg-secondary/80 border border-blue-400/50 shadow-md hover:bg-blue-500 hover:text-white transition duration-300">
+                        ${skill} 💡
+                    </span>
+                `).join('');
+            }
+
+            // RENDER 6: Education
+            const educationList = document.getElementById('education-list');
+            if (educationList) {
+                educationList.innerHTML = portfolioData.education.map(edu => `
+                    <li class="flex items-start">
+                        <span class="text-primary-color mr-2 leading-none">&raquo;</span>
+                        <div>
+                            <div class="font-medium">${edu.degree}</div>
+                            <div class="text-xs text-gray-400">${edu.institution} (${edu.duration}) - Grade: ${edu.grade}</div>
+                        </div>
+                    </li>
+                `).join('');
+            }
+            
+            // RENDER 7: Learning Skills
+            const learningSkillsList = document.getElementById('learning-skills-list');
+            if (learningSkillsList) {
+                learningSkillsList.innerHTML = portfolioData.learningSkills.map(skill => `
+                    <span class="text-xs font-medium text-white px-3 py-1 rounded-full bg-secondary/80 border border-primary-color/50 shadow-md hover:bg-primary-color hover:text-deep-charcoal transition duration-300">
+                        ${skill} 📚
+                    </span>
+                `).join('');
+            }
+
+            // RENDER 8: Certifications
+            const certificationsList = document.getElementById('certifications-list');
+            if (certificationsList) {
+                certificationsList.innerHTML = portfolioData.certifications.map(cert => `
+                    <li class="flex items-start">
+                        <span class="text-primary-color mr-2 leading-none">&raquo;</span>
+                        <div>
+                            <div class="font-medium">${cert.title}</div>
+                            <div class="text-xs text-gray-400">${cert.provider} ${cert.year}</div>
+                        </div>
+                    </li>
+                `).join('');
+            }
+
+            // Render icons
+            document.getElementById('phone-icon').innerHTML = icons.phone;
+            document.getElementById('mail-icon').innerHTML = icons.mail;
+            document.getElementById('github-icon').innerHTML = icons.github;
+            document.getElementById('linkedin-icon').innerHTML = icons.linkedin;
+            document.getElementById('npm-icon').innerHTML = icons.npm;
+            document.getElementById('dev-icon').innerHTML = icons.dev;
+            document.getElementById('design-icon').innerHTML = icons.design;
+            document.getElementById('cert-icon').innerHTML = icons.cert;
+            document.getElementById('collaboration-btn').innerHTML = `${icons.mail} <span class="ml-3">INITIATE COLLABORATION REQUEST</span>`;
+            
+            // Render navigation icons
+            document.getElementById('nav-home-icon').innerHTML = icons.home;
+            document.getElementById('nav-work-icon').innerHTML = icons.work;
+            document.getElementById('nav-skills-icon').innerHTML = icons.skills;
+            document.getElementById('nav-contact-icon').innerHTML = icons.contact;
+            document.getElementById('sidebar-collab-btn').innerHTML = `${icons.mail} <span class="ml-2">INITIATE COLLABORATION REQUEST</span>`;
+            document.getElementById('education-icon').innerHTML = icons.education;
+            document.getElementById('learning-icon').innerHTML = icons.learning;
+            document.getElementById('skills-icon').innerHTML = icons.skills;
+            
+            // Attach copy listeners with enhanced feedback
+            document.querySelectorAll('[data-copy-text]').forEach(element => {
+                element.addEventListener('click', async (e) => {
+                    const text = element.getAttribute('data-copy-text');
+                    const originalText = element.innerHTML;
+                    
+                    // Visual feedback
+                    element.innerHTML = '✓ Copied!';
+                    element.classList.add('text-green-400');
+                    
+                    await copyToClipboard(text);
+                    
+                    setTimeout(() => {
+                        element.innerHTML = originalText;
+                        element.classList.remove('text-green-400');
+                    }, 1500);
+                });
+            });
+            
+            // Add keyboard navigation
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && isModalOpen) {
+                    hideModal();
+                }
+                if (e.key === 'Enter' && document.getElementById('otp-modal').style.display !== 'none') {
+                    verifyOTP();
+                }
+            });
+            
+
+
+            // Enhanced page load with performance tracking
+            performanceMetrics.pageLoadTime = performance.now();
+            
+            // Add scroll animations
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('animate-fade-in');
+                    }
+                });
+            }, observerOptions);
+            
+            document.querySelectorAll('.data-card, .credit-card').forEach(card => {
+                observer.observe(card);
+            });
+            
+            // Development mode toggle (Ctrl+Shift+D)
+            document.addEventListener('keydown', (e) => {
+                if (e.ctrlKey && e.shiftKey && e.key === 'D') {
+                    toggleDevMode();
+                }
+            });
+            
+            // Update performance indicator
+            updatePerformanceIndicator();
+        });
+        
+        // OTP Verification
+        function verifyOTP() {
+            const otp1 = document.getElementById('otp-1').value;
+            const otp2 = document.getElementById('otp-2').value;
+            const otp3 = document.getElementById('otp-3').value;
+            const otp4 = document.getElementById('otp-4').value;
+            const enteredOTP = otp1 + otp2 + otp3 + otp4;
+            
+            if (enteredOTP === '2828') {
+                // Store authentication in localStorage
+                localStorage.setItem('portfolioAuth', 'verified');
+                document.getElementById('otp-modal').classList.add('hidden');
+                document.getElementById('main-content').classList.remove('hidden');
+                showNotification('Access granted! Welcome to the portfolio', 'success');
+            } else {
+                ['otp-1', 'otp-2', 'otp-3', 'otp-4'].forEach(id => {
+                    document.getElementById(id).classList.add('border-red-500');
+                });
+                showNotification('Invalid OTP. Contact bank account holder', 'error');
+                setTimeout(() => {
+                    ['otp-1', 'otp-2', 'otp-3', 'otp-4'].forEach(id => {
+                        document.getElementById(id).classList.remove('border-red-500');
+                    });
+                }, 2000);
+            }
+        }
+        
+        // OTP Input Navigation
+        function setupOTPInputs() {
+            const inputs = ['otp-1', 'otp-2', 'otp-3', 'otp-4'];
+            
+            inputs.forEach((id, index) => {
+                const input = document.getElementById(id);
+                
+                input.addEventListener('input', (e) => {
+                    // Only allow numbers
+                    e.target.value = e.target.value.replace(/[^0-9]/g, '');
+                    
+                    if (e.target.value && index < 3) {
+                        setTimeout(() => {
+                            document.getElementById(inputs[index + 1]).focus();
+                        }, 10);
+                    }
+                    if (index === 3 && e.target.value) {
+                        setTimeout(() => {
+                            verifyOTP();
+                        }, 100);
+                    }
+                });
+                
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Backspace' && !e.target.value && index > 0) {
+                        document.getElementById(inputs[index - 1]).focus();
+                    }
+                });
+            });
+        }
+        
+        // Smooth scroll to section
+        function scrollToSection(sectionId) {
+            document.getElementById(sectionId).scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+        
+        // Development mode functions
+        let devMode = false;
+        
+        function toggleDevMode() {
+            devMode = !devMode;
+            const indicator = document.getElementById('perf-indicator');
+            indicator.style.display = devMode ? 'block' : 'none';
+            
+            if (devMode) {
+                showNotification('Dev mode enabled (Ctrl+Shift+D to toggle)', 'success');
+                updatePerformanceIndicator();
+            } else {
+                showNotification('Dev mode disabled', 'success');
+            }
+        }
+        
+        function updatePerformanceIndicator() {
+            if (!devMode) return;
+            
+            const perfText = document.getElementById('perf-text');
+            const loadTime = Math.round(performanceMetrics.pageLoadTime);
+            const apiCalls = performanceMetrics.apiCalls;
+            const errors = performanceMetrics.errors;
+            
+            perfText.textContent = `Load: ${loadTime}ms | API: ${apiCalls} | Errors: ${errors}`;
+            
+            // Update every 5 seconds in dev mode
+            if (devMode) {
+                setTimeout(updatePerformanceIndicator, 5000);
+            }
+        }
+    </script>
+</head>
+<body class="bg-pattern antialiased">
+
+    <!-- Enhanced Global Notification -->
+    <div id="notification" class="hidden fixed top-4 right-4 p-3 rounded-lg shadow-lg z-50 transition-all duration-300 opacity-0 translate-y-2">
+        Notification message
+    </div>
+    
+    <!-- Performance indicator (dev mode) -->
+    <div id="perf-indicator" class="fixed bottom-4 left-4 text-xs text-gray-500 bg-gray-800 px-2 py-1 rounded opacity-50 hover:opacity-100 transition-opacity" style="display: none;">
+        <span id="perf-text">Performance: Loading...</span>
+    </div>
+
+    <!-- OTP Login Modal -->
+    <div id="otp-modal" class="fixed inset-0 z-50 bg-pattern flex items-center justify-center p-4">
+        <div class="modal-card credit-card w-full max-w-md p-8 rounded-4xl">
+            <header class="mb-6 text-center">
+                <h2 class="text-2xl font-bold text-white mb-2">Portfolio Access</h2>
+                <p class="text-gray-400 text-sm">Enter OTP to view portfolio</p>
+            </header>
+            
+            <div class="space-y-4">
+                <div class="flex justify-center space-x-3">
+                    <input type="text" id="otp-1" maxlength="1" class="w-12 h-12 text-center text-xl font-bold bg-secondary text-white border border-primary-color/50 focus:border-primary-color focus:outline-none rounded-lg">
+                    <input type="text" id="otp-2" maxlength="1" class="w-12 h-12 text-center text-xl font-bold bg-secondary text-white border border-primary-color/50 focus:border-primary-color focus:outline-none rounded-lg">
+                    <input type="text" id="otp-3" maxlength="1" class="w-12 h-12 text-center text-xl font-bold bg-secondary text-white border border-primary-color/50 focus:border-primary-color focus:outline-none rounded-lg">
+                    <input type="text" id="otp-4" maxlength="1" class="w-12 h-12 text-center text-xl font-bold bg-secondary text-white border border-primary-color/50 focus:border-primary-color focus:outline-none rounded-lg">
+                </div>
+                <button onclick="verifyOTP()" class="w-full highlight-button px-4 py-3 rounded-lg text-lg hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary/50">
+                    Verify & Enter
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <main id="main-content" class="container mx-auto p-4 pb-20 hidden">
+        <h1 class="sr-only">Vikas B. Gavandi Portfolio - Digital Credit Card View</h1>
+
+        <div class="grid lg:grid-cols-3 gap-8">
+            <!-- COLUMN 1: Credit Card & Contact (Col-span 1 on desktop, full width on mobile) -->
+            <div class="lg:col-span-1 space-y-8">
+
+                <!-- 1. The Portfolio Card (Credit Card Design) -->
+                <section id="portfolio-card" class="credit-card p-6 md:p-8 w-full max-w-sm lg:max-w-none mx-auto rounded-4xl h-72 flex flex-col justify-between shadow-2xl">
+                    <header class="flex justify-between items-start">
+                        <!-- Chip -->
+                        <div class="chip"></div>
+                        <!-- Logo/Icon -->
+                        <div class="text-primary-color text-2xl font-bold tracking-widest">
+                            V<span class="text-gray-400">BG</span>
+                        </div>
+                    </header>
+
+                    <!-- Card Number / Focus -->
+                    <div class="flex flex-col space-y-1">
+                        <p class="text-sm text-gray-400 font-medium tracking-wider">PRIMARY FOCUS</p>
+                        <div class="text-white text-3xl font-semibold tracking-wider flex items-center space-x-3">
+                            <span class="text-primary-color">ARCHITECT</span>
+                            <span class="text-gray-400">&</span>
+                            <span>DESIGNER</span>
+                        </div>
+                    </div>
+
+                    <!-- Name and Validity -->
+                    <footer class="flex justify-between items-center text-sm font-light">
+                        <div>
+                            <p class="text-gray-400">CARDHOLDER NAME</p>
+                            <p class="uppercase text-white text-lg tracking-wider font-semibold">VIKAS B. GAVANDI</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-gray-400">MEMBER SINCE</p>
+                            <p class="text-white text-lg tracking-wider font-semibold">2012</p>
+                        </div>
+                    </footer>
+                </section>
+
+                <!-- 2. Contact Details (Account Summary) -->
+                <section id="contact-summary" class="data-card p-6 space-y-4">
+                    <h2 class="text-xl font-bold text-white flex items-center"><span class="text-primary-color mr-2 text-2xl">|</span> Account Details</h2>
+                    <div class="magnetic-line mb-4"></div>
+                    
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center text-sm text-gray-300">
+                            <span class="flex items-center space-x-2 w-1/3 opacity-75">
+                                <span id="phone-icon"></span>
+                                <span>Phone</span>
+                            </span>
+                            <button data-copy-text="9172656043" class="w-2/3 text-right hover:text-primary-color transition duration-200 focus:outline-none focus:ring focus:ring-primary/50 rounded-md p-1 -m-1 focus-visible pulse-on-hover">
+                                +91 72656 043 <span class="text-xs text-gray-500">(Tap to Copy)</span>
+                            </button>
+                        </div>
+
+                        <div class="flex justify-between items-center text-sm text-gray-300">
+                            <span class="flex items-center space-x-2 w-1/3 opacity-75">
+                                <span id="mail-icon"></span>
+                                <span>Email</span>
+                            </span>
+                            <button data-copy-text="vikasgavandi.dev@gmail.com" class="w-2/3 text-right hover:text-primary-color transition duration-200 truncate focus:outline-none focus:ring focus:ring-primary/50 rounded-md p-1 -m-1 focus-visible pulse-on-hover">
+                                vikasgavandi.dev@gmail.com <span class="text-xs text-gray-500">(Tap to Copy)</span>
+                            </button>
+                        </div>
+
+                        <div class="flex justify-between items-center text-sm text-gray-300">
+                            <span class="flex items-center space-x-2 w-1/3 opacity-75">
+                                <span id="github-icon"></span>
+                                <span>GitHub</span>
+                            </span>
+                            <a href="https://github.com/vikasgavandi" target="_blank" class="w-2/3 text-right text-primary-color hover:underline transition duration-200">
+                                /vikasgavandi
+                            </a>
+                        </div>
+                        
+                        <div class="flex justify-between items-center text-sm text-gray-300">
+                            <span class="flex items-center space-x-2 w-1/3 opacity-75">
+                                <span id="linkedin-icon"></span>
+                                <span>LinkedIn</span>
+                            </span>
+                            <a href="https://www.linkedin.com/in/vikas-gavandi-689163289/" target="_blank" class="w-2/3 text-right text-primary-color hover:underline transition duration-200">
+                                /vikas-gavandi
+                            </a>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- 3. NPM Packages (Mini-Account Status) -->
+                <section id="npm-packages" class="data-card p-6 space-y-4">
+                    <h2 class="text-xl font-bold text-white flex items-center"><span id="npm-icon"></span><span class="text-primary-color ml-2">NPM</span> Status</h2>
+                    <div class="magnetic-line mb-4"></div>
+                    <ul id="npm-list" class="space-y-3">
+                        <!-- Content inserted by JS -->
+                    </ul>
+                </section>
+                
+                <!-- Vintage Computer Setup -->
+                <div class="text-center">
+                    <img src="https://www.pikpng.com/pngl/b/49-491950_mac-vintage-computer-vintage-computer-png-clipart.png" alt="Vintage Macintosh Setup" class="w-full h-32 object-contain mb-2">
+                    <p class="text-xs text-gray-400">Classic Developer Setup</p>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="space-y-3">
+                    <button onclick="generateCareerAnalysis()" class="w-full highlight-button px-4 py-2 rounded-lg text-sm hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus-visible pulse-on-hover">
+                        ✨ Analyze Career Trajectory
+                    </button>
+                    <button class="w-full highlight-button px-4 py-2 rounded-lg text-sm hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus-visible pulse-on-hover" onclick="window.location.href='mailto:vikasgavandi.dev@gmail.com'">
+                        <span id="sidebar-collab-btn" class="flex items-center justify-center text-sm">INITIATE COLLABORATION REQUEST</span>
+                    </button>
+                </div>
+
+            </div>
+
+            <!-- COLUMN 2 & 3: Experience Transactions & Data Grid (Col-span 2 on desktop, full width on mobile) -->
+            <div class="lg:col-span-2 space-y-8">
+
+
+
+                <!-- 4. Experience (Transaction History) -->
+                <section id="experience" class="data-card p-6">
+                    <h2 class="text-2xl font-bold text-white mb-4 flex items-center">
+                        <span class="text-primary-color mr-2 text-3xl font-extrabold">&gt;</span> Transaction History (Experience)
+                    </h2>
+                    <div class="magnetic-line mb-6"></div>
+                    
+                    <div id="experience-list" class="space-y-4 max-h-[600px] overflow-y-auto pr-2">
+                        <!-- Content inserted by JS -->
+                    </div>
+                </section>
+
+                <!-- 5. Data Grid (Skills & Certifications) -->
+                <section id="data-grid" class="data-card p-6">
+                    <h2 class="text-2xl font-bold text-white mb-4 flex items-center">
+                        <span class="text-primary-color mr-2 text-3xl font-extrabold">&gt;</span> Data Matrix
+                    </h2>
+                    <div class="magnetic-line mb-6"></div>
+
+                    <div class="grid md:grid-cols-2 gap-6">
+                        
+                        <!-- Languages/Frameworks -->
+                        <div>
+                            <h3 class="text-xl font-semibold text-primary-color mb-3 flex items-center"><span id="dev-icon"></span> <span class="ml-2">Tech Stack (Langs & Frameworks)</span></h3>
+                            <div id="tech-skills-list" class="flex flex-wrap gap-2">
+                                <!-- Content inserted by JS -->
+                            </div>
+                        </div>
+
+                        <!-- Hard Skills -->
+                        <div>
+                            <h3 class="text-xl font-semibold text-primary-color mb-3 flex items-center"><span id="design-icon"></span> <span class="ml-2">Hard Skills</span></h3>
+                            <div id="hard-skills-list" class="flex flex-wrap gap-2">
+                                <!-- Content inserted by JS -->
+                            </div>
+                        </div>
+                        
+                        <!-- Soft Skills -->
+                        <div>
+                            <h3 class="text-xl font-semibold text-primary-color mb-3 flex items-center"><span id="skills-icon"></span> <span class="ml-2">Soft Skills</span></h3>
+                            <div id="soft-skills-list" class="flex flex-wrap gap-2">
+                                <!-- Content inserted by JS -->
+                            </div>
+                        </div>
+
+                        <!-- Education -->
+                        <div>
+                            <h3 class="text-xl font-semibold text-primary-color mb-3 flex items-center"><span id="education-icon"></span> <span class="ml-2">Academic Background</span></h3>
+                            <ul id="education-list" class="space-y-2 text-sm text-gray-300">
+                                <!-- Content inserted by JS -->
+                            </ul>
+                        </div>
+                        
+                        <!-- Learning Skills -->
+                        <div>
+                            <h3 class="text-xl font-semibold text-primary-color mb-3 flex items-center"><span id="learning-icon"></span> <span class="ml-2">Currently Learning</span></h3>
+                            <div id="learning-skills-list" class="flex flex-wrap gap-2">
+                                <!-- Content inserted by JS -->
+                            </div>
+                        </div>
+                        
+                        <!-- Certifications -->
+                        <div class="md:col-span-2">
+                            <h3 class="text-xl font-semibold text-primary-color mb-3 flex items-center"><span id="cert-icon"></span> <span class="ml-2">Advanced Certifications</span></h3>
+                            <ul id="certifications-list" class="space-y-2 text-sm text-gray-300">
+                                <!-- Content inserted by JS -->
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+
+            </div>
+        </div>
+
+    </main>
+
+    <!-- LLM Powered Skill Modal (Hidden by Default) -->
+    <div id="skill-modal" class="hidden fixed inset-0 z-50 bg-black bg-opacity-70 flex items-center justify-center p-4" onclick="hideModal()">
+        <div class="modal-card credit-card w-full max-w-xl p-8 rounded-4xl transition duration-300 transform scale-90 opacity-0" onclick="event.stopPropagation()">
+            <header class="mb-6 border-b border-primary-color/50 pb-3 flex justify-between items-center">
+                <h3 id="modal-title" class="text-2xl font-bold text-white">Capability Insight</h3>
+                <button onclick="hideModal()" class="text-gray-400 hover:text-primary-color transition duration-200 text-3xl leading-none">&times;</button>
+            </header>
+            
+            <div id="modal-content" class="min-h-[100px]">
+                <!-- Generated content or loading spinner goes here -->
+            </div>
+
+            <footer class="mt-6 text-right text-xs text-gray-500">
+                Powered by Gemini. Insight based on candidate's portfolio history.
+            </footer>
+        </div>
+    </div>
+    
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav fixed bottom-0 left-0 right-0 z-40 p-4">
+        <div class="container mx-auto">
+            <div class="flex justify-center space-x-8">
+                <button onclick="scrollToSection('portfolio-card')" class="flex flex-col items-center space-y-1 text-gray-400 hover:text-primary-color transition duration-200">
+                    <span id="nav-home-icon"></span>
+                    <span class="text-xs">Home</span>
+                </button>
+                <button onclick="scrollToSection('experience')" class="flex flex-col items-center space-y-1 text-gray-400 hover:text-primary-color transition duration-200">
+                    <span id="nav-work-icon"></span>
+                    <span class="text-xs">Work</span>
+                </button>
+                <button onclick="scrollToSection('data-grid')" class="flex flex-col items-center space-y-1 text-gray-400 hover:text-primary-color transition duration-200">
+                    <span id="nav-skills-icon"></span>
+                    <span class="text-xs">Skills</span>
+                </button>
+                <button onclick="scrollToSection('contact-summary')" class="flex flex-col items-center space-y-1 text-gray-400 hover:text-primary-color transition duration-200">
+                    <span id="nav-contact-icon"></span>
+                    <span class="text-xs">Contact</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+</body>
+</html>
